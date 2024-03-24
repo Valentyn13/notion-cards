@@ -1,0 +1,27 @@
+enum DatabaseColumnName {
+    ID = 'id',
+    EMAIL = 'email',
+    PASSWORD_HASH = 'password_hash',
+    PASSWORD_SALT = 'password_salt',
+    FIRST_NAME = 'first_name',
+    LAST_NAME = 'last_name',
+    CREATED_AT = 'created_at',
+    UPDATED_AT = 'updated_at',
+    DELETED_AT = 'deleted_at',
+    NAME = 'name',
+    USER_ID = 'user_id',
+    TAG_ID = 'tag_id',
+    BOARD_ID = 'board_id',
+    BOARD_RIGHT_ID = 'board_right_id',
+    LIMIT = 'limit',
+    ORDER = 'ordr',
+    COLOR = 'color',
+    DESCRIPTION = 'description',
+    COLUMN_ID = 'column_id',
+    CARD_ID = 'card_id',
+    URL = 'url',
+    TEXT = 'text',
+    AVATAR = 'avatar',
+}
+
+export { DatabaseColumnName };
