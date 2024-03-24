@@ -4,11 +4,12 @@
     "type": "module",
     "engines": {
         "node": "18.x.x",
-        "npm": "9.x.x"
+        "npm": "10.x.x"
     },
     "scripts": {
         "lint:css": "npx stylelint \"src/**/*.scss\"",
         "lint:js": "npx eslint \"src/**/*.{ts,tsx}\"",
+        "lint:js:fix": "npx eslint \"src/**/*.{ts,tsx}\" --fix",
         "lint:type": "npx tsc --noEmit",
         "lint": "npm run lint:type && npm run lint:js",
         "start:dev": "vite",
@@ -32,7 +33,7 @@
         "eslint-plugin-react": "7.32.0",
         "eslint-plugin-react-hooks": "4.6.0",
         "sass": "1.58.3",
-        "stylelint-config-standard-scss": "7.0.1",
+        "stylelint-config-standard-scss": "13.0.0",
         "vite": "4.0.0",
         "vite-tsconfig-paths": "4.0.5"
     }

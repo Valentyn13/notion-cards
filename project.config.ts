@@ -1,5 +1,5 @@
 const ProjectPrefix = {
-    APP: 'ss',
+    APP: 'nc',
     ENVIRONMENTS: ['development', 'production'],
 } as const;
 

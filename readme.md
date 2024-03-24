@@ -40,24 +40,6 @@ TBA
 
 ### 💽 DB Schema
 
-```mermaid
-erDiagram
-   foo {
-    int id PK
-    varchar quux
-   }
-   bar {
-    int id PK
-    int foo_id FK
-   }
-   baz {
-    int id PK
-    int bar_id FK
-   }
-   foo ||--|| bar : foo_id
-   bar ||--|{ baz : bar_id
-```
-
 ### 🌑 Backend
 
 -   [Fastify](https://www.fastify.io/) — a backend framework.
@@ -93,7 +75,7 @@ erDiagram
 
 ##### Example
 
--   `rg-5: Add Dashboard`
+-   `nc-5: Add Dashboard`
 
 #### 🌳 Branch flow
 
@@ -108,9 +90,9 @@ erDiagram
 
 ##### Examples
 
--   `task/rg-5-add-dashboard`
--   `task/rg-12-add-user-flow`
--   `fix/rg-16-fix-user-flow`
+-   `task/nc-5-add-dashboard`
+-   `task/nc-12-add-user-flow`
+-   `fix/nc-16-fix-user-flow`
 
 #### 🗂 Commit flow
 
@@ -126,9 +108,9 @@ erDiagram
 
 ##### Examples
 
--   `rg-5: + title for dashboard`
--   `rg-12: * dashboard title`
--   `rg-16: - dashboard title`
+-   `nc-5: + title for dashboard`
+-   `nc-12: * dashboard title`
+-   `nc-16: - dashboard title`
 
 ## 📦 CD
 
