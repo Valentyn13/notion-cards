@@ -4,14 +4,15 @@
     "type": "module",
     "engines": {
         "node": "18.x.x",
-        "npm": "9.x.x"
+        "npm": "10.x.x"
     },
     "scripts": {
         "lint:type": "npx tsc --noEmit",
-        "lint:js": "npx eslint \"src/**/*.ts\"",
+        "lint:js": "npx eslint --fix \"src/**/*.ts\"",
         "lint": "npm run lint:type && npm run lint:js",
-        "start:dev": "nodemon --exec node --loader ts-paths-esm-loader ./src/index.ts",
+        "start:dev": "nodemon --exec node --trace-warnings --loader ts-paths-esm-loader src/index.ts",
         "migrate:dev": "node --loader ts-paths-esm-loader ../node_modules/knex/bin/cli.js migrate:latest",
+        "seed:run": "node --loader ts-paths-esm-loader ../node_modules/knex/bin/cli.js seed:run",
         "migrate:dev:make": "node --loader ts-paths-esm-loader ../node_modules/knex/bin/cli.js migrate:make -x ts",
         "migrate:dev:down": "node --loader ts-paths-esm-loader ../node_modules/knex/bin/cli.js migrate:down",
         "migrate:dev:rollback": "node --loader ts-paths-esm-loader ../node_modules/knex/bin/cli.js migrate:rollback --all",
