@@ -1,9 +1,9 @@
+import  { type UserWithoutHashPasswords } from 'shared/build/index.js';
+
 import  { type IUserEntityFields } from '~/bundles/users/user.entity.js';
 import { UserEntity } from '~/bundles/users/user.entity.js';
 import { type UserModel } from '~/bundles/users/user.model.js';
 import { AbstractRepository } from '~/common/database/abstract.repository.js';
-
-import  { type UserSignUpResponseDto } from './users.js';
 
 type IUserRepo ={
     findAll(): Promise<UserEntity[]>;
@@ -21,12 +21,12 @@ class UserRepository extends AbstractRepository<typeof UserModel, IUserEntityFie
         return users.map((it) => UserEntity.initialize(it));
     }
 
-    public getUserWithoutHashPasswordsById (id: string, modification?:string):Promise<UserSignUpResponseDto> {
+    public getUserWithoutHashPasswordsById (id: string, modification?:string):Promise<UserWithoutHashPasswords> {
         let query = this.model.query().findById(id);
         if (modification){
             query = query.modify(modification);
         }
-        return query.castTo<UserSignUpResponseDto>().execute();
+        return query.castTo<UserWithoutHashPasswords>().execute();
     }
 
     public async findOneByEmail({ email }: { email:string }): ReturnType<IUserRepo['findOneByEmail']>{

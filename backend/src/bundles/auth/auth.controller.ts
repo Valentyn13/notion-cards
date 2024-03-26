@@ -94,7 +94,7 @@ class AuthController extends Controller {
             body: UserSignUpRequestDto;
         }>,
     ): Promise<
-        ApiHandlerResponse<{ user: UserSignUpResponseDto; token: string }>
+        ApiHandlerResponse<UserSignUpResponseDto>
     > {
         try {
             const user = await this.authService.signUp(options.body);

@@ -1,12 +1,8 @@
+import  { type UserWithoutHashPasswords } from './user-without-hash-passwords.type';
+
 type UserSignUpResponseDto = {
-    id: string;
-    email: string;
-    firstName: string;
-    lastName: string;
-    createdAt: string;
-    updatedAt: string;
-    deletedAt: string;
-    avatar?: string | null
+    user:UserWithoutHashPasswords,
+    token: string
 };
 
 export { type UserSignUpResponseDto };

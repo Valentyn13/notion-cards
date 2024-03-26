@@ -1,9 +1,8 @@
-import  { type UserSignInRequestDto, type UserSignInResponseDto } from 'shared/build/index.js';
+import  { type UserSignInRequestDto, type UserSignInResponseDto,type UserSignUpResponseDto   } from 'shared/build/index.js';
 
 import { ApiPath, ContentType } from '~/bundles/common/enums/enums.js';
 import {
     type UserSignUpRequestDto,
-    type UserSignUpResponseDto,
 } from '~/bundles/users/users.js';
 import { HttpApi } from '~/framework/api/api.js';
 import { type IHttp } from '~/framework/http/http.js';

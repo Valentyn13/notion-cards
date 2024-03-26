@@ -1,3 +1,5 @@
+import  { type UserWithoutHashPasswords } from 'shared/build/index.js';
+
 import  { type IUserEntityFields } from '~/bundles/users/user.entity.js';
 import { UserEntity } from '~/bundles/users/user.entity.js';
 import { type UserRepository } from '~/bundles/users/user.repository.js';
@@ -6,7 +8,6 @@ import { type IService } from '~/common/interfaces/interfaces.js';
 import {
     type UserGetAllResponseDto,
     type UserSignUpRequestDto,
-    type UserSignUpResponseDto,
 } from './types/types.js';
 import  { type UserModel } from './user.model.js';
 
@@ -24,7 +25,7 @@ class UserService implements IService {
         return await this.userRepository.getById(id);
     }
 
-    public async getUserWithoutHashPasswordsById(id: string, modification?:string):Promise<UserSignUpResponseDto> {
+    public async getUserWithoutHashPasswordsById(id: string, modification?:string):Promise<UserWithoutHashPasswords> {
         return await this.userRepository.getUserWithoutHashPasswordsById(id, modification);
     }
 

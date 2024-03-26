@@ -35,7 +35,7 @@ class AuthService {
 
     public async signUp(
         userRequestDto: UserSignUpRequestDto,
-    ): Promise<{ user: UserSignUpResponseDto; token: string }> {
+    ): Promise<UserSignUpResponseDto> {
         const { password } = userRequestDto;
         const passwordSalt = await this.generateSalt();
         const passwordHash = await this.encrypt(String(password), passwordSalt);
