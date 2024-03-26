@@ -42,6 +42,15 @@ class Config implements IConfig {
                     env: 'PORT',
                     default: null,
                 },
+                ORIGIN_URL: {
+                    doc: 'Http origin for development',
+                    format: String,
+                    env:
+                        process.env.NODE_ENV === AppEnvironment.PRODUCTION
+                            ? 'PRODUCTION_ORIGIN_URL'
+                            : 'CLIENT_DEVELOPMENT_SERVER_URL',
+                    default: null,
+                },
             },
             DB: {
                 CONNECTION_STRING: {
@@ -68,6 +77,32 @@ class Config implements IConfig {
                     env: 'DB_POOL_MAX',
                     default: null,
                 },
+            },
+            JWT: {
+                ACCESS_TOKEN_SECRET: {
+                    doc: 'Secret key for access token generation',
+                    format: String,
+                    env: 'ACCESS_TOKEN_SECRET',
+                    default: null,
+                },
+                REFRESH_TOKEN_SECRET: {
+                    doc: 'Secret key for refresh token generation',
+                    format: String,
+                    env: 'REFRESH_TOKEN_SECRET',
+                    default: null,
+                },
+                ACCESS_TOKEN_EXPIRES_IN: '24h',
+                REFRESH_TOKEN_EXPIRES_IN: '30d',
+                EMAIL_CONFIRM_TOKEN_EXPIRES_IN: '8m',
+            },
+            COOKIE: {
+                COOKIE_SECRET: {
+                    doc: 'Secret key for cookie',
+                    format: String,
+                    env: 'COOKIE_SECRET',
+                    default: null,
+                },
+                EXPIRES_IN: 60 * 60 * 24 * 30,
             },
         });
     }

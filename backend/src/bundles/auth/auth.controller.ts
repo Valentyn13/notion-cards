@@ -1,4 +1,14 @@
-import { type UserSignUpRequestDto } from '~/bundles/users/users.js';
+import {
+    type AuthError,
+    type UserSignInRequestDto,
+    type UserSignInResponseDto,
+    userSignInValidationSchema,
+} from 'shared/build/index.js';
+
+import {
+    type UserSignUpRequestDto,
+    type UserSignUpResponseDto,
+} from '~/bundles/users/users.js';
 import { userSignUpValidationSchema } from '~/bundles/users/users.js';
 import {
     type ApiHandlerOptions,
@@ -30,6 +40,20 @@ class AuthController extends Controller {
                 this.signUp(
                     options as ApiHandlerOptions<{
                         body: UserSignUpRequestDto;
+                    }>,
+                ),
+        });
+
+        this.addRoute({
+            path: AuthApiPath.SIGN_IN,
+            method: 'POST',
+            validation: {
+                body: userSignInValidationSchema,
+            },
+            handler: (options) =>
+                this.login(
+                    options as ApiHandlerOptions<{
+                        body: UserSignInRequestDto;
                     }>,
                 ),
         });
@@ -69,11 +93,59 @@ class AuthController extends Controller {
         options: ApiHandlerOptions<{
             body: UserSignUpRequestDto;
         }>,
-    ): Promise<ApiHandlerResponse> {
-        return {
-            status: HttpCode.CREATED,
-            payload: await this.authService.signUp(options.body),
-        };
+    ): Promise<
+        ApiHandlerResponse<{ user: UserSignUpResponseDto; token: string }>
+    > {
+        try {
+            const user = await this.authService.signUp(options.body);
+            return {
+                status: HttpCode.CREATED,
+                payload: user,
+            };
+        } catch (error: unknown) {
+            const {
+                message,
+                status = HttpCode.INTERNAL_SERVER_ERROR,
+                errorType,
+            } = error as AuthError;
+            return {
+                status,
+                payload: {
+                    message,
+                    status,
+                    errorType,
+                },
+            };
+        }
+    }
+
+    private async login(
+        options: ApiHandlerOptions<{
+            body: UserSignInRequestDto;
+        }>,
+    ): Promise<
+        ApiHandlerResponse<Omit<UserSignInResponseDto, 'refreshToken'>>
+    > {
+        try {
+            const { refreshToken, ...userData } = await this.authService.logIn(
+                options.body,
+            );
+            return {
+                refreshToken,
+                status: HttpCode.OK,
+                payload: userData,
+            };
+        } catch (error: unknown) {
+            const { message, status, errorType } = error as AuthError;
+            return {
+                status,
+                payload: {
+                    message,
+                    status,
+                    errorType,
+                },
+            };
+        }
     }
 }
 

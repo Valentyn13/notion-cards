@@ -1,7 +1,14 @@
 type DefaultApiHandlerOptions = {
     body?: unknown;
+    rawBody?: unknown;
     query?: unknown;
     params?: unknown;
+    user?: unknown;
+    headers?: unknown;
+    cookies?: unknown;
+    unsignCookie?: unknown;
+    socket?: unknown;
+    fileBuffer?: unknown;
 };
 
 type ApiHandlerOptions<
