@@ -1,21 +1,32 @@
 export { AuthApiPath } from './bundles/auth/auth.js';
+export { OpenAuthApiPath } from './bundles/open-auth/open-auth.js';
 export {
+    type EncryptionDataPayload,
     type UserGetAllItemResponseDto,
     type UserGetAllResponseDto,
+    type UserSignInRequestDto,
+    type UserSignInResponseDto,
     type UserSignUpRequestDto,
     type UserSignUpResponseDto,
+    type UserWithoutHashPasswords,
+    emailValidationSchema,
     UsersApiPath,
+    userSignInValidationSchema,
     userSignUpValidationSchema,
+    UserValidationRule,
 } from './bundles/users/users.js';
 export {
     ApiPath,
     AppEnvironment,
     ContentType,
+    CookieName,
+    ExceptionMessage,
     ServerErrorType,
 } from './enums/enums.js';
 export { type IConfig } from './framework/config/config.js';
 export {
     ApplicationError,
+    AuthError,
     HttpError,
     ValidationError,
 } from './framework/exceptions/exceptions.js';

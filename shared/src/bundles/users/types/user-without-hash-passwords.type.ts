@@ -1,4 +1,4 @@
-type UserSignUpResponseDto = {
+type UserWithoutHashPasswords = {
     id: string;
     email: string;
     firstName: string;
@@ -6,7 +6,7 @@ type UserSignUpResponseDto = {
     createdAt: string;
     updatedAt: string;
     deletedAt: string;
-    avatar?: string | null
+    avatar?: string | null;
 };
 
-export { type UserSignUpResponseDto };
+export { type UserWithoutHashPasswords };
