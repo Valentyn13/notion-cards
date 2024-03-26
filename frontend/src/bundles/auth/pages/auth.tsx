@@ -1,3 +1,5 @@
+import  { type UserSignInRequestDto } from 'shared/build/index.js';
+
 import { AppRoute } from '~/bundles/common/enums/enums.js';
 import {
     useAppDispatch,
@@ -17,16 +19,29 @@ const Auth: React.FC = () => {
     }));
     const { pathname } = useLocation();
 
-    const handleSignInSubmit = useCallback((): void => {
-        // handle sign in
-    }, []);
+    const handleSignInSubmit = useCallback((event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        const data = new FormData(event.currentTarget);
+        const signInData = {
+            email: data.get('email'),
+            password: data.get('password'),
+        } as UserSignInRequestDto;
+        void dispatch(authActions.logIn(signInData));
+      }, [dispatch]);
 
     const handleSignUpSubmit = useCallback(
-        (payload: UserSignUpRequestDto): void => {
-            void dispatch(authActions.signUp(payload));
-        },
-        [dispatch],
-    );
+        (event: React.FormEvent<HTMLFormElement>) => {
+            event.preventDefault();
+            const data = new FormData(event.currentTarget);
+            const signUpData = {
+                email: data.get('email'),
+                password: data.get('password'),
+                firstName: data.get('firstName'),
+                lastName: data.get('lastName')
+            } as UserSignUpRequestDto;
+            void dispatch(authActions.signUp(signUpData));
+          },
+        [dispatch]);
 
     const getScreen = (screen: string): React.ReactNode => {
         switch (screen) {
