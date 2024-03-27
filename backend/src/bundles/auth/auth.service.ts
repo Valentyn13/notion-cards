@@ -40,7 +40,15 @@ class AuthService {
     public async signUp(
         userRequestDto: UserSignUpRequestDto,
     ): Promise<UserSignUpResponseDto> {
-        const { password } = userRequestDto;
+        const { password, email } = userRequestDto;
+        const userByEmail = await this.userService.findByEmail({ email });
+        if(userByEmail) {
+            throw new AuthError({
+                message:ExceptionMessage.USER_EXISTS,
+                status:HttpCode.BAD_REQUEST,
+                errorType: ServerErrorType.EMAIL
+            });
+        }
         const passwordSalt = await this.generateSalt();
         const passwordHash = await this.encrypt(String(password), passwordSalt);
 
@@ -82,7 +90,7 @@ class AuthService {
         if (!isEqualPassword) {
             throw new AuthError({
                 message: ExceptionMessage.INVALID_PASSWORD,
-                status: HttpCode.UNAUTHORIZED,
+                status: HttpCode.BAD_REQUEST,
                 errorType: ServerErrorType.PASSWORD,
             });
         }

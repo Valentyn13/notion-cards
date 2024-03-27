@@ -1,6 +1,10 @@
+import { type FastifyReply } from 'fastify';
+
+import { CookieName } from '~/common/controller/enums/enums.js';
 import { type ILogger } from '~/common/logger/logger.js';
 import { type ServerAppRouteParameters } from '~/common/server-application/server-application.js';
 
+import { cookieOptions } from '../server-application/constants/cookie-options.js';
 import { type IController } from './interfaces/interface.js';
 import {
     type ApiHandler,
@@ -29,24 +33,76 @@ class Controller implements IController {
             ...options,
             path: fullPath,
             handler: (request, reply) =>
-                this.mapHandler(handler, request, reply),
+                this.prepareAndHandleApiRequest(handler, request, reply),
         });
     }
 
-    private async mapHandler(
-        handler: ApiHandler,
+    private setTokenInCookies({
+        reply,
+        //accessToken,
+        refreshToken,
+        //redirectSubPathCookie,
+    }: {
+        reply: FastifyReply;
+        accessToken?: string;
+        refreshToken?: string;
+        redirectSubPathCookie?: string;
+    }):void {
+        // const { path, maxAge } = cookieOptions;
+        // if (accessToken) {
+        //     return reply
+        //         .clearCookie(CookieName.OAUTH_TOKEN)
+        //         .setCookie(CookieName.ACCESS_TOKEN, accessToken, {
+        //             path,
+        //             maxAge,
+        //         })
+        //         .setCookie(
+        //             CookieName.REFRESH_TOKEN,
+        //             refreshToken as string,
+        //             cookieOptions,
+        //         )
+        //         .redirect(
+        //             `${config.ENV.APP.ORIGIN_URL}${redirectSubPathCookie}`,
+        //         );
+        // }
+        if (refreshToken) {
+            void reply.setCookie(
+                CookieName.REFRESH_TOKEN,
+                refreshToken,
+                cookieOptions,
+            );
+        }
+    }
+
+    private async prepareAndHandleApiRequest(
+        apiHandler: ApiHandler,
         request: Parameters<ServerAppRouteParameters['handler']>[0],
         reply: Parameters<ServerAppRouteParameters['handler']>[1],
     ): Promise<void> {
         this.logger.info(`${request.method.toUpperCase()} on ${request.url}`);
 
-        const handlerOptions = this.mapRequest(request);
-        const { status, payload } = await handler(handlerOptions);
+        const requestHandlerOptions = this.handleRequestOptions(request);
 
-        return await reply.status(status).send(payload);
+        const redirectSubPathCookie =
+            request.cookies[CookieName.REDIRECT_PATH] ?? '';
+
+        const { status, payload, refreshToken, accessToken, contentType } =
+            await apiHandler(requestHandlerOptions);
+
+        this.setTokenInCookies({
+            reply,
+            accessToken,
+            refreshToken,
+            redirectSubPathCookie,
+        });
+
+        if (contentType) {
+            void reply.header('Content-Type', contentType);
+        }
+        return reply.status(status).send(payload);
     }
 
-    private mapRequest(
+    private handleRequestOptions(
         request: Parameters<ServerAppRouteParameters['handler']>[0],
     ): ApiHandlerOptions {
         const {
@@ -61,7 +117,6 @@ class Controller implements IController {
             fileBuffer,
         } = request;
         const unsignCookie = request.unsignCookie.bind(request);
-
         return {
             body,
             rawBody,

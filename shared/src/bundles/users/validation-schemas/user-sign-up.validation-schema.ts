@@ -31,7 +31,6 @@ const userSignUp = joi.object<UserSignUpRequestDto, true>({
         'string.min': UserValidationMessage.LASTNAME_SHORT,
         'string.max': UserValidationMessage.LASTNAME_LONG
     }),
-    avatar: joi.string().trim()
 });
 
 export { userSignUp };

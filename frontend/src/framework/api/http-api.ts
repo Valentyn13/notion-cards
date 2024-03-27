@@ -1,3 +1,5 @@
+import { AuthApiPath, AuthError, ExceptionMessage } from 'shared/build/index.js';
+
 import {
     type ContentType,
     ServerErrorType,
@@ -6,7 +8,7 @@ import {
     type ServerErrorResponse,
     type ValueOf,
 } from '~/bundles/common/types/types.js';
-import { type HttpCode, type IHttp } from '~/framework/http/http.js';
+import {  type IHttp,HttpCode } from '~/framework/http/http.js';
 import { HttpError, HttpHeader } from '~/framework/http/http.js';
 import { type IStorage, StorageKey } from '~/framework/storage/storage.js';
 import { configureString } from '~/helpers/helpers.js';
@@ -41,15 +43,55 @@ class HttpApi implements IHttpApi {
         path: string,
         options: HttpApiOptions,
     ): Promise<HttpApiResponse> {
-        const { method, contentType, payload = null, hasAuth } = options;
+        const {
+            method,
+            contentType,
+            payload = null,
+            hasAuth,
+            withCredentials = false,
+        } = options;
 
         const headers = await this.getHeaders(contentType, hasAuth);
 
-        const response = await this.http.load(path, {
+        let response = await this.http.load(path, {
             method,
             headers,
             payload,
+            withCredentials,
         });
+
+        if (response.status === HttpCode.EXPIRED_TOKEN) {
+            const tokenResponse = await this.http.load(
+                this.getFullEndpoint(AuthApiPath.TOKEN, {}),
+                {
+                    method,
+                    headers,
+                    payload,
+                    withCredentials,
+                },
+            );
+
+            const { accessToken } =
+                (await tokenResponse.json()) as { accessToken:string | undefined };
+
+                if(!accessToken){
+                    throw new AuthError({
+                        message:ExceptionMessage.AUTH_FAILED,
+                        status:HttpCode.BAD_REQUEST,
+                        errorType:ServerErrorType.VALIDATION
+                    });
+                }
+            await this.storage.set(StorageKey.ACCESS_TOKEN, accessToken);
+
+            const newHeaders = await this.getHeaders(contentType, hasAuth);
+
+            response = await this.http.load(path, {
+                method,
+                headers: newHeaders,
+                payload,
+                withCredentials,
+            });
+        }
 
         return (await this.checkResponse(response)) as HttpApiResponse;
     }

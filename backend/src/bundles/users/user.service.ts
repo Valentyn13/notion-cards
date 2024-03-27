@@ -42,7 +42,6 @@ class UserService implements IService {
             email,
             firstName,
             lastName,
-            avatar,
             passwordHash,
             passwordSalt
         }: UserSignUpRequestDto & {
@@ -60,8 +59,7 @@ class UserService implements IService {
                 passwordHash: passwordHash ?? null,
                 lastName,
                 firstName,
-                avatar
-            }) as unknown as Omit<IUserEntityFields, 'id' | 'email' | 'createdAt' | 'updatedAt'>,
+            }) as unknown as Omit<IUserEntityFields, 'id' | 'email' | 'createdAt' | 'updatedAt' | 'avatar'>,
             transaction,
         ));
         await transaction.commit();

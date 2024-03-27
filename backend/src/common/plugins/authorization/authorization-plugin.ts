@@ -14,7 +14,7 @@ import { ControllerHook } from '~/common/controller/enums/enums.js';
 import { type IService } from '~/common/interfaces/service.interface.js';
 
 type AuthorizationPluginPayload = {
-    publicRoutes: Map<AuthApiPath, string>;
+    publicRoutes: Partial<Record<AuthApiPath, string>>;
     userService: IService;
     authService: AuthService;
 };
@@ -28,7 +28,9 @@ const authorization = fp<AuthorizationPluginPayload>(
 
         fastify.addHook(ControllerHook.ON_REQUEST, async (request:FastifyRequest, reply: FastifyReply) => {
             try {
-                const isPublicRoute = publicRoutes.has(request.routerPath as AuthApiPath);
+                const isPublicRoute = Object.values(publicRoutes).includes(
+                    request.routerPath,
+                );
 
                 if (isPublicRoute) {
                     return;

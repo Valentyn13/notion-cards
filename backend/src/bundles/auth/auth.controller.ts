@@ -1,8 +1,10 @@
+import  { type FastifyRequest } from 'fastify';
 import  {
     type AuthError,
     type UserSignInRequestDto,
     type UserSignInResponseDto,
-    type UserWithoutHashPasswords } from 'shared/build/index.js';
+    type UserWithoutHashPasswords,    CookieName,
+    ExceptionMessage } from 'shared/build/index.js';
 import {
     userSignInValidationSchema
 } from 'shared/build/index.js';
@@ -12,6 +14,7 @@ import {
     type UserSignUpResponseDto,
 } from '~/bundles/users/users.js';
 import { userSignUpValidationSchema } from '~/bundles/users/users.js';
+import { config } from '~/common/config/config.js';
 import {
     type ApiHandlerOptions,
     type ApiHandlerResponse,
@@ -23,6 +26,8 @@ import { type ILogger } from '~/common/logger/logger.js';
 
 import { type AuthService } from './auth.service.js';
 import { AuthApiPath } from './enums/enums.js';
+import { generateRefreshToken } from './helpers/generate-refresh-token.js';
+import { generateToken } from './helpers/generate-token.js';
 
 class AuthController extends Controller {
     private authService: AuthService;
@@ -64,6 +69,18 @@ class AuthController extends Controller {
             path:AuthApiPath.USER,
             method:'GET',
             handler:(options) => this.getUser(options as ApiHandlerOptions<{ user: UserWithoutHashPasswords }>)
+        });
+
+        this.addRoute({
+            path: AuthApiPath.TOKEN,
+            method: 'GET',
+            handler: (options) =>
+                this.regenerateToken(
+                    options as ApiHandlerOptions<{
+                        cookies: FastifyRequest['cookies'];
+                        unsignCookie: FastifyRequest['unsignCookie'];
+                    }>,
+                ),
         });
     }
 
@@ -171,6 +188,43 @@ class AuthController extends Controller {
                 status,
                 payload: {
                     message,
+                    status,
+                },
+            };
+        }
+    }
+
+    private regenerateToken({
+        cookies,
+        unsignCookie,
+    }: ApiHandlerOptions<{
+        cookies: FastifyRequest['cookies'];
+        unsignCookie: FastifyRequest['unsignCookie'];
+    }>): ApiHandlerResponse<{ accessToken: string }> {
+        try {
+            const unsignedCookie = unsignCookie(
+                cookies[CookieName.REFRESH_TOKEN] as NonNullable<string>,
+            );
+            const oldRefreshToken = unsignedCookie.value as string;
+
+            const { id } = this.authService.verifyToken<Record<'id', string>>(
+                oldRefreshToken,
+                config.ENV.JWT.REFRESH_TOKEN_SECRET,
+            );
+
+            const accessToken = generateToken({ id });
+            const refreshToken = generateRefreshToken({ id });
+            return {
+                refreshToken,
+                status: HttpCode.OK,
+                payload: { accessToken },
+            };
+        } catch (error: unknown) {
+            const { status } = error as AuthError;
+            return {
+                status,
+                payload: {
+                    message: ExceptionMessage.INVALID_REFRESH_TOKEN,
                     status,
                 },
             };
