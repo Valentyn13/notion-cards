@@ -11,18 +11,31 @@ import Link from '@mui/material/Link';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { useCallback } from 'react';
+import  { type UserSignInRequestDto } from 'shared/build';
+import { userSignInValidationSchema } from 'shared/build';
+
+import { useAppForm } from '~/bundles/common/hooks/hooks';
+import { useFormFieldCreator } from '~/bundles/common/hooks/use-form-field-creator/use-form-field-creator.hook';
+
+import { DEFAULT_SIGN_IN_PAYLOAD } from './constants/constants';
 
 type Properties = {
-    onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
+    onSubmit: (payload: UserSignInRequestDto) => void;
 };
 
 const SignInForm: React.FC<Properties> = ({ onSubmit }) => {
 
-    const handleSubmit = useCallback(
+    const { control, errors, handleSubmit } =
+    useAppForm<UserSignInRequestDto>({
+        defaultValues: DEFAULT_SIGN_IN_PAYLOAD,
+        validationSchema: userSignInValidationSchema,
+    });
+
+    const handleSubmitForm = useCallback(
         (event: React.FormEvent<HTMLFormElement>) => {
-            onSubmit(event);
+            void handleSubmit(onSubmit)(event);
         },
-        [onSubmit],
+        [onSubmit, handleSubmit],
     );
 
     return (
@@ -44,7 +57,7 @@ const SignInForm: React.FC<Properties> = ({ onSubmit }) => {
                 </Typography>
                 <Box
                     component="form"
-                    onSubmit={handleSubmit}
+                    onSubmit={handleSubmitForm}
                     noValidate
                     sx={{ mt: 1 }}
                 >
@@ -54,18 +67,22 @@ const SignInForm: React.FC<Properties> = ({ onSubmit }) => {
                         fullWidth
                         id="email"
                         label="Email Address"
-                        name="email"
                         autoComplete="email"
+                        error={!!errors.email}
+                        helperText={errors.email?.message}
+                        {...useFormFieldCreator({ name:'email', control })}
                     />
                     <TextField
                         margin="normal"
                         required
                         fullWidth
-                        name="password"
                         label="Password"
                         type="password"
                         id="password"
                         autoComplete="current-password"
+                        error={!!errors.password}
+                        helperText={errors.password?.message}
+                        {...useFormFieldCreator({ name:'password', control })}
                     />
                     <FormControlLabel
                         control={<Checkbox value="remember" color="primary" />}
