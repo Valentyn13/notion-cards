@@ -4,7 +4,7 @@ import  { type AuthError,type UserWithoutHashPasswords  } from 'shared/build/ind
 import { DataStatus } from '~/bundles/common/enums/enums.js';
 import { type ValueOf } from '~/bundles/common/types/types.js';
 
-import { logIn, signUp } from './actions.js';
+import { getUser, logIn, signUp } from './actions.js';
 
 type State = {
     user: UserWithoutHashPasswords | null
@@ -23,16 +23,16 @@ const { reducer, actions, name } = createSlice({
     name: 'auth',
     reducers: {},
     extraReducers(builder) {
-        builder.addMatcher(isAnyOf(signUp.pending, logIn.pending),(state) =>{
+        builder.addMatcher(isAnyOf(signUp.pending, logIn.pending, getUser.pending),(state) =>{
             state.dataStatus = DataStatus.PENDING;
             state.error = null;
         });
-        builder.addMatcher(isAnyOf(signUp.fulfilled, logIn.fulfilled),(state, action) =>{
+        builder.addMatcher(isAnyOf(signUp.fulfilled, logIn.fulfilled, getUser.fulfilled),(state, action) =>{
             state.dataStatus = DataStatus.FULFILLED;
             state.user = action.payload;
             state.error = null;
         });
-        builder.addMatcher(isAnyOf(signUp.rejected, logIn.rejected),(state, action) =>{
+        builder.addMatcher(isAnyOf(signUp.rejected, logIn.rejected, getUser.rejected),(state, action) =>{
             state.dataStatus = DataStatus.REJECTED;
             state.error = action.payload as AuthError;
         });

@@ -54,4 +54,19 @@ UserSignInRequestDto,
     },
 );
 
-export { logIn,signUp };
+const getUser = createAsyncThunk<
+    UserWithoutHashPasswords,
+    undefined,
+    AsyncThunkConfig
+>(`${sliceName}/get-user`,
+async (_, { extra ,rejectWithValue }) =>{
+    try {
+        const { authApi } = extra;
+        return await authApi.getUser();
+    } catch (error) {
+        const { message, errorType } = error as AuthError;
+        return rejectWithValue({ message, errorType });
+    }
+});
+
+export { getUser,logIn,signUp };

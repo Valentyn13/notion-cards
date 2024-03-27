@@ -1,13 +1,16 @@
 import { genSalt, hash } from 'bcrypt';
-import {
+import jwt from 'jsonwebtoken';
+import  {
     type EncryptionDataPayload,
     type UserSignInRequestDto,
     type UserSignInResponseDto,
+    type UserWithoutHashPasswords } from 'shared/build/index.js';
+import {
     AuthError,
     ExceptionMessage,
     HttpCode,
-    ServerErrorType,
-} from 'shared/build/index.js';
+    HttpError,
+    ServerErrorType } from 'shared/build/index.js';
 
 import {
     type UserSignUpRequestDto,
@@ -18,6 +21,7 @@ import { type IConfig } from '~/common/config/config.js';
 
 import { generateRefreshToken } from './helpers/generate-refresh-token.js';
 import { generateToken } from './helpers/generate-token.js';
+import { verifyToken } from './helpers/verify-token.js';
 
 type ConstructorType = {
     userService: UserService;
@@ -92,6 +96,9 @@ class AuthService {
             refreshToken: generateRefreshToken({ id }),
         };
     }
+    public async getUserWithoutHashPasswordsById(id:string):Promise<UserWithoutHashPasswords>{
+        return await this.userService.getUserWithoutHashPasswordsById(id);
+    }
 
     public async generateSalt(): Promise<string> {
         const USER_PASSWORD_SALT_ROUNDS = 10;
@@ -100,6 +107,20 @@ class AuthService {
 
     public encrypt(data: string, salt: string): Promise<string> {
         return hash(data, salt);
+    }
+
+    public verifyToken<T>(token: string, tokenSecret: string): T {
+        try {
+            return verifyToken(token, tokenSecret) as T;
+        } catch (error) {
+            if (error instanceof jwt.TokenExpiredError) {
+                throw new HttpError({
+                    message: ExceptionMessage.TOKEN_EXPIRED,
+                    status: HttpCode.EXPIRED_TOKEN,
+                });
+            }
+            throw new AuthError();
+        }
     }
 
     public async compare({

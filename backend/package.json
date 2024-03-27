@@ -29,12 +29,15 @@
         "tsconfig-paths": "3.12.0"
     },
     "dependencies": {
+        "@fastify/cookie": "9.3.1",
+        "@fastify/cors": "9.0.1",
         "@fastify/swagger": "8.3.1",
         "@fastify/swagger-ui": "1.4.0",
         "bcrypt": "5.1.1",
         "convict": "6.2.4",
         "dotenv": "16.0.3",
         "fastify": "4.11.0",
+        "fastify-plugin": "4.5.1",
         "guid-typescript": "1.0.9",
         "jsonwebtoken": "9.0.2",
         "knex": "2.4.2",

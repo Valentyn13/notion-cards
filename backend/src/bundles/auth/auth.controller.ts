@@ -1,8 +1,10 @@
-import {
+import  {
     type AuthError,
     type UserSignInRequestDto,
     type UserSignInResponseDto,
-    userSignInValidationSchema,
+    type UserWithoutHashPasswords } from 'shared/build/index.js';
+import {
+    userSignInValidationSchema
 } from 'shared/build/index.js';
 
 import {
@@ -56,6 +58,12 @@ class AuthController extends Controller {
                         body: UserSignInRequestDto;
                     }>,
                 ),
+        });
+
+        this.addRoute({
+            path:AuthApiPath.USER,
+            method:'GET',
+            handler:(options) => this.getUser(options as ApiHandlerOptions<{ user: UserWithoutHashPasswords }>)
         });
     }
 
@@ -143,6 +151,27 @@ class AuthController extends Controller {
                     message,
                     status,
                     errorType,
+                },
+            };
+        }
+    }
+
+    private async getUser(options: ApiHandlerOptions<{ user: UserWithoutHashPasswords }>):Promise<ApiHandlerResponse<UserWithoutHashPasswords>> {
+        try {
+            const { id } = options.user;
+            const user = await this.authService.getUserWithoutHashPasswordsById(id);
+            return{
+                status:HttpCode.OK,
+                payload:user
+            }; 
+        } catch (error) {
+            const message = (error as Error).message;
+            const status = HttpCode.INTERNAL_SERVER_ERROR;
+            return {
+                status,
+                payload: {
+                    message,
+                    status,
                 },
             };
         }
