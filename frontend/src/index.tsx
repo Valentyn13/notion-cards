@@ -12,6 +12,8 @@ import {
 import { AppRoute } from '~/bundles/common/enums/enums';
 import { store } from '~/framework/store/store';
 
+import { GuestRoute } from './bundles/common/components/guest-route/guest-route';
+
 createRoot(document.querySelector('#root') as HTMLElement).render(
     <StrictMode>
         <StoreProvider store={store.instance}>
@@ -20,19 +22,26 @@ createRoot(document.querySelector('#root') as HTMLElement).render(
                     {
                         path: AppRoute.ROOT,
                         element: <App />,
-                        children: [
+                        children: [                            
                             {
                                 path: AppRoute.ROOT,
                                 element: 'Root',
                             },
                             {
-                                path: AppRoute.SIGN_IN,
-                                element: <Auth />,
+                                path: AppRoute.ROOT,
+                                element:<GuestRoute/>,
+                                children:[
+                                    {
+                                        path: AppRoute.SIGN_IN,
+                                        element: <Auth />,
+                                    },
+                                    {
+                                        path: AppRoute.SIGN_UP,
+                                        element: <Auth />,
+                                    },
+                                ]
                             },
-                            {
-                                path: AppRoute.SIGN_UP,
-                                element: <Auth />,
-                            },
+
                         ],
                     },
                 ]}
