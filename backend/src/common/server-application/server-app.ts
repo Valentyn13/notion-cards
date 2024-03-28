@@ -1,7 +1,11 @@
+import fastifyCookie from '@fastify/cookie';
+import cors from '@fastify/cors';
 import swagger, { type StaticDocumentSpec } from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
 import Fastify, { type FastifyError } from 'fastify';
 
+import { authService } from '~/bundles/auth/auth.js';
+import { userService } from '~/bundles/users/users.js';
 import { type IConfig } from '~/common/config/config.js';
 import { type IDatabase } from '~/common/database/database.js';
 import { ServerErrorType } from '~/common/enums/enums.js';
@@ -14,6 +18,9 @@ import {
     type ValidationSchema,
 } from '~/common/types/types.js';
 
+import { ControllerHook } from '../controller/enums/enums.js';
+import { authorizationPlugin } from '../plugins/plugins.js';
+import { publicRoutes } from './constants/public-routes.js';
 import {
     type IServerApp,
     type IServerAppApi,
@@ -91,6 +98,23 @@ class ServerApp implements IServerApp {
 
                 await this.app.register(swaggerUi, {
                     routePrefix: `${it.version}/documentation`,
+                });
+
+                await this.app.register(authorizationPlugin,{
+                    publicRoutes,
+                    userService,
+                    authService
+                });
+
+                await this.app.register(cors, {
+                    origin: this.config.ENV.APP.ORIGIN_URL,
+                    methods: '*',
+                    credentials: true,
+                });
+
+                await this.app.register(fastifyCookie, {
+                    secret: this.config.ENV.COOKIE.COOKIE_SECRET,
+                    hook: ControllerHook.ON_REQUEST,
                 });
             }),
         );

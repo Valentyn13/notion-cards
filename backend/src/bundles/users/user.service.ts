@@ -1,3 +1,6 @@
+import  { type UserWithoutHashPasswords } from 'shared/build/index.js';
+
+import  { type IUserEntityFields } from '~/bundles/users/user.entity.js';
 import { UserEntity } from '~/bundles/users/user.entity.js';
 import { type UserRepository } from '~/bundles/users/user.repository.js';
 import { type IService } from '~/common/interfaces/interfaces.js';
@@ -5,8 +8,8 @@ import { type IService } from '~/common/interfaces/interfaces.js';
 import {
     type UserGetAllResponseDto,
     type UserSignUpRequestDto,
-    type UserSignUpResponseDto,
 } from './types/types.js';
+import  { type UserModel } from './user.model.js';
 
 class UserService implements IService {
     private userRepository: UserRepository;
@@ -14,9 +17,16 @@ class UserService implements IService {
     public constructor(userRepository: UserRepository) {
         this.userRepository = userRepository;
     }
+    public async findByEmail({ email }:{ email:string }):Promise<UserModel | null> {
+        return await this.userRepository.findOneByEmail({ email });
+    }
 
-    public find(): ReturnType<IService['find']> {
-        return Promise.resolve(null);
+    public async getById(id: string): ReturnType<IService['getById']> {
+        return await this.userRepository.getById(id);
+    }
+
+    public async getUserWithoutHashPasswordsById(id: string, modification?:string):Promise<UserWithoutHashPasswords> {
+        return await this.userRepository.getUserWithoutHashPasswordsById(id, modification);
     }
 
     public async findAll(): Promise<UserGetAllResponseDto> {
@@ -28,25 +38,43 @@ class UserService implements IService {
     }
 
     public async create(
-        payload: UserSignUpRequestDto,
-    ): Promise<UserSignUpResponseDto> {
-        const user = await this.userRepository.create(
+        {
+            email,
+            firstName,
+            lastName,
+            passwordHash,
+            passwordSalt
+        }: UserSignUpRequestDto & {
+            passwordSalt?: string;
+            passwordHash?: string;
+        },
+    ): Promise<Pick<IUserEntityFields, 'id' | 'email'>> {
+        const transaction = await this.userRepository.model.startTransaction();
+
+        // TODO: Bullshit with type aseartion (as)
+        const item = (await this.userRepository.createWithTransaction(
             UserEntity.initializeNew({
-                email: payload.email,
-                passwordSalt: 'SALT', // TODO
-                passwordHash: 'HASH', // TODO
-            }),
-        );
+                email,
+                passwordSalt: passwordSalt ?? null,
+                passwordHash: passwordHash ?? null,
+                lastName,
+                firstName,
+            }) as unknown as Omit<IUserEntityFields, 'id' | 'email' | 'createdAt' | 'updatedAt' | 'avatar'>,
+            transaction,
+        ));
+        await transaction.commit();
 
+        const user = UserEntity.initialize(item);
         return user.toObject();
+
     }
 
-    public update(): ReturnType<IService['update']> {
-        return Promise.resolve(null);
+    public async update(id:string, payload:Partial<IUserEntityFields>): ReturnType<IService<IUserEntityFields>['update']> {
+        return await this.userRepository.update(id, payload);
     }
 
-    public delete(): ReturnType<IService['delete']> {
-        return Promise.resolve(true);
+    public async deleteById(id:string): Promise<ReturnType<IService<IUserEntityFields>['deleteById']>> {
+        return await this.userRepository.deleteById(id);
     }
 }
 

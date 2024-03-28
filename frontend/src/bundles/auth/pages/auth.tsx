@@ -1,3 +1,5 @@
+import { type UserSignInRequestDto } from 'shared/build/index.js';
+
 import { AppRoute } from '~/bundles/common/enums/enums.js';
 import {
     useAppDispatch,
@@ -17,12 +19,15 @@ const Auth: React.FC = () => {
     }));
     const { pathname } = useLocation();
 
-    const handleSignInSubmit = useCallback((): void => {
-        // handle sign in
-    }, []);
+    const handleSignInSubmit = useCallback(
+        (payload: UserSignInRequestDto) => {
+            void dispatch(authActions.logIn(payload));
+        },
+        [dispatch],
+    );
 
     const handleSignUpSubmit = useCallback(
-        (payload: UserSignUpRequestDto): void => {
+        (payload: UserSignUpRequestDto) => {
             void dispatch(authActions.signUp(payload));
         },
         [dispatch],

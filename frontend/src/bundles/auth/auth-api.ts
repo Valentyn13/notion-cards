@@ -1,8 +1,12 @@
-import { ApiPath, ContentType } from '~/bundles/common/enums/enums.js';
 import {
-    type UserSignUpRequestDto,
+    type UserSignInRequestDto,
+    type UserSignInResponseDto,
     type UserSignUpResponseDto,
-} from '~/bundles/users/users.js';
+    type UserWithoutHashPasswords,
+} from 'shared/build/index.js';
+
+import { ApiPath, ContentType } from '~/bundles/common/enums/enums.js';
+import { type UserSignUpRequestDto } from '~/bundles/users/users.js';
 import { HttpApi } from '~/framework/api/api.js';
 import { type IHttp } from '~/framework/http/http.js';
 import { type IStorage } from '~/framework/storage/storage.js';
@@ -34,6 +38,35 @@ class AuthApi extends HttpApi {
         );
 
         return await response.json<UserSignUpResponseDto>();
+    }
+
+    public async logIn(
+        payload: UserSignInRequestDto,
+    ): Promise<UserSignInResponseDto> {
+        const response = await this.load(
+            this.getFullEndpoint(AuthApiPath.SIGN_IN, {}),
+            {
+                method: 'POST',
+                contentType: ContentType.JSON,
+                payload: JSON.stringify(payload),
+                hasAuth: false,
+            },
+        );
+
+        return await response.json<UserSignInResponseDto>();
+    }
+
+    public async getUser(): Promise<UserWithoutHashPasswords> {
+        const response = await this.load(
+            this.getFullEndpoint(AuthApiPath.USER, {}),
+            {
+                method: 'GET',
+                contentType: ContentType.JSON,
+                hasAuth: true,
+            },
+        );
+
+        return await response.json<UserWithoutHashPasswords>();
     }
 }
 

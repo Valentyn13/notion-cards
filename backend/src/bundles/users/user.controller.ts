@@ -1,13 +1,18 @@
+import  { type UserGetAllResponseDto  } from 'shared/build/index.js';
+import { HttpError } from 'shared/build/index.js';
+
 import { type UserService } from '~/bundles/users/user.service.js';
+import  {
+    type ApiHandlerOptions, 
+    type ApiHandlerResponse } from '~/common/controller/controller.js';
 import {
-    type ApiHandlerResponse,
-    Controller,
-} from '~/common/controller/controller.js';
+    Controller } from '~/common/controller/controller.js';
 import { ApiPath } from '~/common/enums/enums.js';
 import { HttpCode } from '~/common/http/http.js';
 import { type ILogger } from '~/common/logger/logger.js';
 
 import { UsersApiPath } from './enums/enums.js';
+import  { type IUserEntityFields } from './user.entity.js';
 
 /**
  * @swagger
@@ -37,6 +42,17 @@ class UserController extends Controller {
             method: 'GET',
             handler: () => this.findAll(),
         });
+
+        this.addRoute({
+            path: UsersApiPath.ROOT,
+            method: 'DELETE',
+            handler: (options) =>
+                this.deleteById(
+                    options as ApiHandlerOptions<{
+                        params: { id: string };
+                    }>,
+                ),
+        });
     }
 
     /**
@@ -54,11 +70,37 @@ class UserController extends Controller {
      *                items:
      *                  $ref: '#/components/schemas/User'
      */
-    private async findAll(): Promise<ApiHandlerResponse> {
+    private async findAll(): Promise<ApiHandlerResponse<UserGetAllResponseDto>> {
         return {
             status: HttpCode.OK,
             payload: await this.userService.findAll(),
         };
+    }
+
+    private async deleteById(options:ApiHandlerOptions<{ params: { id: string; }; }>):Promise<ApiHandlerResponse<IUserEntityFields>> {
+        try {
+            const deletedUser = await this.userService.deleteById(options.params.id);
+            return {
+                status:HttpCode.OK,
+                payload:deletedUser
+            };
+        } catch (error) {
+            //console.log(error);
+            return error instanceof HttpError
+            ? {
+                  status: error.status,
+                  payload: {
+                      message: error.message,
+                  },
+              }
+            : {
+                  status: HttpCode.INTERNAL_SERVER_ERROR,
+                  payload: {
+                      message: 'Internal server error.',
+                  },
+              };
+        }
+        
     }
 }
 

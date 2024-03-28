@@ -1,32 +1,28 @@
 import reactLogo from '~/assets/img/react.svg';
+import { actions as authActions } from '~/bundles/auth/store';
 import { Link, RouterOutlet } from '~/bundles/common/components/components.js';
+import { DashboardHeader } from '~/bundles/common/components/headers/dashboard-header';
+import { GuestHeader } from '~/bundles/common/components/headers/guest-header';
 import { AppRoute } from '~/bundles/common/enums/enums.js';
 import {
     useAppDispatch,
-    useAppSelector,
     useEffect,
     useLocation,
 } from '~/bundles/common/hooks/hooks.js';
-import { actions as userActions } from '~/bundles/users/store';
 
 const App: React.FC = () => {
     const { pathname } = useLocation();
     const dispatch = useAppDispatch();
-    const { users, dataStatus } = useAppSelector(({ users }) => ({
-        users: users.users,
-        dataStatus: users.dataStatus,
-    }));
-
-    const isRoot = pathname === AppRoute.ROOT;
 
     useEffect(() => {
-        if (isRoot) {
-            void dispatch(userActions.loadAll());
-        }
-    }, [isRoot, dispatch]);
+        void dispatch(authActions.getUser());
+    }, [dispatch]);
 
     return (
         <>
+        <GuestHeader/>
+        <br/>
+        <DashboardHeader/>
             <img src={reactLogo} className="App-logo" width="30" alt="logo" />
 
             <ul className="App-navigation-list">
@@ -45,17 +41,6 @@ const App: React.FC = () => {
             <div>
                 <RouterOutlet />
             </div>
-            {isRoot && (
-                <>
-                    <h2>Users:</h2>
-                    <h3>Status: {dataStatus}</h3>
-                    <ul>
-                        {users.map((it) => (
-                            <li key={it.id}>{it.email}</li>
-                        ))}
-                    </ul>
-                </>
-            )}
         </>
     );
 };
