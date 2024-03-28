@@ -1,6 +1,5 @@
 import '~/assets/css/styles.scss';
 
-import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
 import { Auth } from '~/bundles/auth/pages/auth';
@@ -15,7 +14,6 @@ import { store } from '~/framework/store/store';
 import { GuestRoute } from './bundles/common/components/guest-route/guest-route';
 
 createRoot(document.querySelector('#root') as HTMLElement).render(
-    <StrictMode>
         <StoreProvider store={store.instance}>
             <RouterProvider
                 routes={[
@@ -47,5 +45,4 @@ createRoot(document.querySelector('#root') as HTMLElement).render(
                 ]}
             />
         </StoreProvider>
-    </StrictMode>,
 );

@@ -1,6 +1,8 @@
 import reactLogo from '~/assets/img/react.svg';
 import { actions as authActions } from '~/bundles/auth/store';
 import { Link, RouterOutlet } from '~/bundles/common/components/components.js';
+import { DashboardHeader } from '~/bundles/common/components/headers/dashboard-header';
+import { GuestHeader } from '~/bundles/common/components/headers/guest-header';
 import { AppRoute } from '~/bundles/common/enums/enums.js';
 import {
     useAppDispatch,
@@ -18,6 +20,9 @@ const App: React.FC = () => {
 
     return (
         <>
+        <GuestHeader/>
+        <br/>
+        <DashboardHeader/>
             <img src={reactLogo} className="App-logo" width="30" alt="logo" />
 
             <ul className="App-navigation-list">
