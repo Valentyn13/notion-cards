@@ -1,20 +1,4 @@
-# ResumeGemm
-
-## ℹ️ General Info
-
-This is the repository responsible for ResumeGemm's apps.
-
-## 🏭 Applications
-
--   [Backend](./backend) — ResumeGemm's application backend.
-
-    _To work properly, fill in the **`.env`** file. Use the **`.env.example`** file as an example._
-
--   [Frontend](./frontend) — ResumeGemm's application frontend.
-
-    _To work properly, fill in the **`.env`** file. Use the **`.env.example`** file as an example._
-
--   [Shared](./shared) — ResumeGemm's application common modules for reuse.
+# Notion Cards
 
 ## 🖍 Requirements
 
